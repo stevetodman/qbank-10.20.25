@@ -14,27 +14,51 @@ final class QBURLSchemeHandler: NSObject, WKURLSchemeHandler {
             return
         }
         let kind = pathComponents[1]
-        let filename = pathComponents.dropFirst(2).joined(separator: "/")
+        let tailComponents = Array(pathComponents.dropFirst(2))
+        guard !tailComponents.isEmpty else {
+            urlSchemeTask.didFailWithError(DirectoryError.invalidPath)
+            return
+        }
         let base = DirectoryHelper.baseURL
         let directory: URL
         switch kind {
         case "images":
-            directory = base.appendingPathComponent("media/images")
+            directory = base.appendingPathComponent("media/images", isDirectory: true)
         case "audio":
-            directory = base.appendingPathComponent("media/audio")
+            directory = base.appendingPathComponent("media/audio", isDirectory: true)
         default:
             urlSchemeTask.didFailWithError(DirectoryError.invalidPath)
             return
         }
-        let fileURL = directory.appendingPathComponent(filename)
-        guard FileManager.default.fileExists(atPath: fileURL.path) else {
+        let resolvedDirectory = directory.resolvingSymlinksInPath()
+        var fileURL = resolvedDirectory
+        for component in tailComponents {
+            fileURL = fileURL.appendingPathComponent(component)
+        }
+        fileURL = fileURL.resolvingSymlinksInPath()
+        let baseComponents = resolvedDirectory.pathComponents
+        let fileComponents = fileURL.pathComponents
+        guard fileComponents.starts(with: baseComponents) else {
+            urlSchemeTask.didFailWithError(DirectoryError.invalidPath)
+            return
+        }
+        var isDirectory: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: fileURL.path, isDirectory: &isDirectory), !isDirectory.boolValue else {
             urlSchemeTask.didFailWithError(DirectoryError.invalidPath)
             return
         }
         do {
             let data = try Data(contentsOf: fileURL)
-            let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: ["Content-Type": mimeType(for: fileURL)])
-            urlSchemeTask.didReceive(response!)
+            guard let response = HTTPURLResponse(
+                url: url,
+                statusCode: 200,
+                httpVersion: nil,
+                headerFields: ["Content-Type": mimeType(for: fileURL)]
+            ) else {
+                urlSchemeTask.didFailWithError(DirectoryError.invalidPath)
+                return
+            }
+            urlSchemeTask.didReceive(response)
             urlSchemeTask.didReceive(data)
             urlSchemeTask.didFinish()
         } catch {
