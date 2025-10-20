@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>CHD Q-Bank - Congenital Heart Disease</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 10px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .header h1 { font-size: 24px; margin-bottom: 5px; }
+    .header p { opacity: 0.9; font-size: 14px; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 12px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .stat-box {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      border-left: 4px solid #667eea;
+    }
+    .stat-box.correct { border-left-color: #10b981; }
+    .stat-box.incorrect { border-left-color: #ef4444; }
+    .stat-box.accuracy { border-left-color: #f59e0b; }
+
+    .stat-label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-value { font-size: 24px; font-weight: bold; color: #333; }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 15px 20px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .control-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    select, .btn-small {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      background: white;
+      color: #333;
+      transition: all 0.2s;
+    }
+    select:hover, .btn-small:hover {
+      border-color: #667eea; background: #f0f4ff;
+    }
+    select { flex: 1; min-width: 120px; }
+
+    .content { flex: 1; padding: 30px 20px; overflow-y: auto; }
+
+    .module-badge {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .question-number { color: #999; font-size: 14px; margin-bottom: 10px; }
+    .question-stem {
+      font-size: 18px; font-weight: 600; color: #333; line-height: 1.6; margin-bottom: 20px;
+    }
+
+    .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+
+    .option {
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: white;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .option:hover:not(.disabled) { border-color: #667eea; background: #f0f4ff; }
+    .option.selected { border-color: #667eea; background: #f0f4ff; }
+    .option.correct { border-color: #10b981; background: #d1fae5; }
+    .option.incorrect { border-color: #ef4444; background: #fee2e2; }
+    .option.disabled { pointer-events: none; }
+
+    .option-letter {
+      min-width: 30px; width: 30px; height: 30px;
+      background: #f0f4ff; border: 2px solid #667eea; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; color: #667eea; flex-shrink: 0;
+    }
+    .option.selected .option-letter { background: #667eea; color: white; }
+    .option.correct .option-letter { background: #10b981; border-color: #10b981; color: white; }
+    .option.incorrect .option-letter { background: #ef4444; border-color: #ef4444; color: white; }
+
+    .option-text { flex: 1; color: #333; font-weight: 500; }
+
+    .explanation {
+      padding: 15px; border-radius: 8px; margin-bottom: 20px; line-height: 1.6; font-size: 14px;
+    }
+    .explanation.correct { background: #d1fae5; border-left: 4px solid #10b981; color: #065f46; }
+    .explanation.incorrect { background: #fee2e2; border-left: 4px solid #ef4444; color: #7f1d1d; }
+
+    .explanation-title { font-weight: 600; margin-bottom: 8px; }
+
+    .actions {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 0 20px 20px;
+    }
+    .btn {
+      padding: 12px 16px; border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-primary { background: #667eea; color: white; grid-column: span 2; }
+    .btn-primary:hover:not(:disabled) {
+      background: #5568d3; transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-secondary { background: #f3f4f6; color: #333; }
+    .btn-secondary:hover { background: #e5e7eb; }
+
+    .time-display {
+      text-align: center; padding: 8px; background: #fff3cd;
+      border-radius: 6px; font-size: 13px; color: #856404; margin-bottom: 15px;
+    }
+
+    /* Simple modal (dialog) styling for Review */
+    dialog#reviewDialog {
+      border: none; border-radius: 12px; padding: 0; max-width: 640px; width: calc(100% - 2rem);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+    .review-header {
+      background: #111827; color: #fff; padding: 14px 18px; border-radius: 12px 12px 0 0;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .review-body { padding: 16px 18px; max-height: 60vh; overflow: auto; }
+    .review-item { padding: 8px 0; border-bottom: 1px dashed #e5e7eb; font-size: 14px; }
+    .review-item:last-child { border-bottom: none; }
+    .badge-correct { color: #065f46; font-weight: 700; }
+    .badge-incorrect { color: #7f1d1d; font-weight: 700; }
+    .review-foot { display: flex; justify-content: flex-end; padding: 12px 18px 16px; gap: 8px; }
+
+    @media (max-width: 768px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .controls { grid-template-columns: 1fr; }
+      .actions { grid-template-columns: 1fr; }
+      .btn-primary { grid-column: span 1; }
+      .question-stem { font-size: 16px; }
+      .content { padding: 20px 15px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>CHD Q-Bank</h1>
+      <p>Congenital Heart Disease – <span id="qCount"></span> Study Questions</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat-box">
+        <div class="stat-label">Progress</div>
+        <div class="stat-value"><span id="current">1</span>/<span id="total">0</span></div>
+      </div>
+      <div class="stat-box correct">
+        <div class="stat-label">Correct</div>
+        <div class="stat-value" id="correctCount">0</div>
+      </div>
+      <div class="stat-box incorrect">
+        <div class="stat-label">Incorrect</div>
+        <div class="stat-value" id="incorrectCount">0</div>
+      </div>
+      <div class="stat-box accuracy">
+        <div class="stat-label">Accuracy</div>
+        <div class="stat-value" id="accuracy">-</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="control-group">
+        <select id="moduleFilter" aria-label="Filter by module">
+          <option value="">All Modules</option>
+          <option value="Module 1">Module 1: Embryology</option>
+          <option value="Module 2">Module 2: Fetal/Transitional</option>
+          <option value="Module 3">Module 3: ASD/VSD/PDA</option>
+          <option value="Module 4">Module 4: TOF/TGA/Truncus</option>
+          <option value="Module 5">Module 5: Eisenmenger/Hemodynamics</option>
+          <option value="Module 6">Module 6: ECG/Imaging</option>
+          <option value="Module 7">Module 7: Management</option>
+          <option value="Module 8">Module 8: Genetics</option>
+        </select>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;white-space:nowrap;">
+          <input type="checkbox" id="flagToggle" />
+          Flagged
+        </label>
+      </div>
+      <div class="control-group">
+        <button class="btn-small" id="shuffleBtn">Shuffle</button>
+        <button class="btn-small" id="resetBtn">Reset</button>
+        <button class="btn-small" id="reviewBtn">Review</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="time-display" id="timeDisplay">Time: 0s</div>
+      <div class="question-number" id="qNumber"></div>
+      <div class="module-badge" id="moduleBadge"></div>
+      <div class="question-stem" id="questionStem"></div>
+      <div class="options" id="optionsContainer"></div>
+      <div id="explanationContainer"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-secondary" id="prevBtn">Previous</button>
+      <button class="btn btn-secondary" id="flagBtn">Flag</button>
+      <button class="btn btn-primary" id="actionBtn" disabled>Submit Answer</button>
+    </div>
+  </div>
+
+  <!-- Review modal -->
+  <dialog id="reviewDialog">
+    <div class="review-header">
+      <div>Review Answers</div>
+      <button class="btn-small" id="closeReview">Close</button>
+    </div>
+    <div class="review-body" id="reviewBody"></div>
+    <div class="review-foot">
+      <button class="btn btn-secondary" id="reviewFilterAll">All</button>
+      <button class="btn btn-secondary" id="reviewFilterWrong">Incorrect only</button>
+    </div>
+  </dialog>
+
+  <script>
+    // ---------------------- DATA ----------------------
+    const questions = [
+      { id: 1, module: "Module 1", stem: "A medical student studies cardiac development. The aorticopulmonary septum must spiral during weeks 5-7. Failure of spiral pattern results in?", options: ["Tetralogy of Fallot", "Transposition of the great arteries", "Truncus arteriosus", "Ventricular septal defect", "Atrial septal defect"], correct: 1, explanation: "TGA results from straight septation instead of spiral, creating discordant ventriculoarterial connections." },
+      { id: 2, module: "Module 1", stem: "Neonate with large defect in lower atrial septum and cleft mitral valve. Karyotype shows trisomy 21. What embryologic structure failed?", options: ["Septum primum", "Septum secundum", "Endocardial cushions", "Sinus venosus", "Truncus arteriosus"], correct: 2, explanation: "Endocardial cushion failure causes primum ASD with cleft mitral valve, strongly associated with Down syndrome." },
+      { id: 3, module: "Module 2", stem: "Hyperoxia test: PaO2 goes from 45 to 50 mmHg with 100% O2. Most likely diagnosis?", options: ["RDS", "Transient tachypnea", "Meconium aspiration", "Transposition of great arteries", "Pneumonia"], correct: 3, explanation: "Minimal PaO2 increase indicates right-to-left cardiac shunting, not pulmonary disease." },
+      { id: 4, module: "Module 2", stem: "Six-month-old with cyanosis ONLY in lower extremities and toes, normal upper extremities. What is diagnosis?", options: ["Tetralogy of Fallot", "ASD with Eisenmenger", "PDA with Eisenmenger", "PPHN", "Transposition"], correct: 2, explanation: "Differential cyanosis in Eisenmenger PDA occurs because shunt enters descending aorta distal to subclavian artery." },
+      { id: 5, module: "Module 2", stem: "During fetal life, which ventricle contributes approximately two-thirds of combined cardiac output?", options: ["Left ventricle", "Right ventricle", "Both equally", "LV over 90%", "RV less than 1/3"], correct: 1, explanation: "RV is dominant in fetal circulation, handling ~2/3 of combined output due to parallel fetal shunts." },
+      { id: 6, module: "Module 3", stem: "Seven-year-old girl with systolic murmur, asymptomatic. Fixed split S2. ECG shows RAD and rsR' in V1. Diagnosis?", options: ["Secundum ASD", "Primum ASD", "VSD", "PDA", "Pulmonic stenosis"], correct: 0, explanation: "Classic secundum ASD with fixed split S2 from RV volume overload and RAD on ECG." },
+      { id: 7, module: "Module 3", stem: "Two-month-old with poor feeding and tachypnea. Holosystolic murmur, cardiomegaly. Was asymptomatic at birth. Why delayed presentation?", options: ["VSD enlarged", "PVR decreased over weeks", "Ductus closed at 6 weeks", "LV dysfunction", "RV hypertrophy"], correct: 1, explanation: "Normal postnatal PVR decline allows increased left-to-right shunt through large VSD, causing CHF by 6-8 weeks." },
+      { id: 8, module: "Module 3", stem: "Premature infant at 30 weeks with continuous murmur and bounding pulses. Best medication for ductal closure?", options: ["Prostaglandin E1", "Indomethacin", "Digoxin", "Furosemide", "Dopamine"], correct: 1, explanation: "Indomethacin reduces prostaglandin synthesis and promotes PDA closure in premature infants." },
+      { id: 9, module: "Module 3", stem: "Three-month-old with Down syndrome. QRS axis -60°, first-degree AV block, biventricular hypertrophy. Diagnosis?", options: ["Large VSD", "Complete AVSD", "Secundum ASD", "PDA", "TOF"], correct: 1, explanation: "Superior leftward axis is virtually diagnostic of AVSD and is characteristic in Down syndrome." },
+      { id: 10, module: "Module 3", stem: "Fourteen-year-old boy with hypertension. Right arm BP 145/80, leg BP 95/60. Femoral pulses weak. Rib notching. Associated lesion?", options: ["ASD", "VSD", "Bicuspid aortic valve", "Pulmonic stenosis", "Tricuspid regurgitation"], correct: 2, explanation: "Coarctation is strongly associated with bicuspid aortic valve in 50-85% of cases." },
+      { id: 11, module: "Module 4", stem: "Four-month-old with TOF has acute severe cyanosis while crying. Murmur becomes soft. Best intervention?", options: ["Supine position", "Knee-chest position", "Supplemental oxygen", "Intubation", "IV fluids"], correct: 1, explanation: "Knee-chest increases SVR, reducing right-to-left shunt and improving oxygenation in hypercyanotic spell." },
+      { id: 12, module: "Module 4", stem: "Newborn with central cyanosis at 6 hours. SpO2 65% on room air, 68% on 100% O2. Egg-on-a-string on CXR. Urgent intervention?", options: ["Indomethacin", "Prostaglandin E1", "Nitric oxide", "Ventilation", "Digoxin"], correct: 1, explanation: "PGE1 is lifesaving in TGA by maintaining ductus arteriosus for adequate mixing." },
+      { id: 13, module: "Module 4", stem: "Six-week-old with mild cyanosis, bounding pulses, single loud S2, increased pulmonary markings. Widened mediastinum. Diagnosis?", options: ["TOF", "Truncus arteriosus", "Transposition", "TAPVR", "Tricuspid atresia"], correct: 1, explanation: "Increased pulmonary markings WITH cyanosis is pathognomonic for truncus arteriosus." },
+      { id: 14, module: "Module 4", stem: "Four-month-old with mild cyanosis and snowman sign on CXR. All pulmonary veins drain to vertical vein. Expected finding?", options: ["Continuous murmur", "Holosystolic murmur", "Fixed split S2", "Single S2", "Loud P2"], correct: 2, explanation: "TAPVR hemodynamics resemble ASD with RV volume overload, producing fixed split S2." },
+      { id: 15, module: "Module 5", stem: "28-year-old with unrepaired large VSD. Exercise intolerance, cyanosis, clubbing. Previously audible murmur now absent. Why?", options: ["VSD closed", "PVR exceeds SVR with shunt reversal", "LV dysfunction", "RV dysfunction", "VSD reduced"], correct: 1, explanation: "Eisenmenger: when PVR exceeds SVR, shunt reverses and pressure gradient eliminated, so murmur disappears." },
+      { id: 16, module: "Module 5", stem: "Child with heart murmur performs sustained handgrip. Holosystolic murmur at left lower sternal border intensifies. Likely lesion?", options: ["ASD", "VSD", "Pulmonic stenosis", "Aortic stenosis", "TOF"], correct: 1, explanation: "Handgrip increases SVR, increasing LV-RV gradient across VSD and intensifying murmur." },
+      { id: 17, module: "Module 6", stem: "Five-year-old with CHD. ECG shows QRS axis -70°. Most likely diagnosis?", options: ["Secundum ASD", "Primum ASD", "VSD", "Pulmonic stenosis", "TOF"], correct: 1, explanation: "Left axis deviation is abnormal in children and is highly specific for primum ASD or complete AVSD." },
+      { id: 18, module: "Module 6", stem: "Adolescent with hypertension. CXR shows scalloping of inferior rib borders bilaterally. Explanation?", options: ["Muscle atrophy", "Enlarged intercostal arteries", "Rib fractures", "Skeletal dysplasia", "Metastases"], correct: 1, explanation: "Rib notching in coarctation results from enlarged intercostal arteries serving as collateral circulation." },
+      { id: 19, module: "Module 6", stem: "Newborn pulse oximetry at 26 hours: right hand 97%, foot 96%. Appropriate action?", options: ["Repeat in 1 hour", "Immediate echo", "Start PGE1", "Document as pass, discharge", "Get ABG"], correct: 3, explanation: "Meets passing criteria (SpO2>=95%, difference<=3%). But screening misses left-sided obstructions." },
+      { id: 20, module: "Module 7", stem: "Neonate at 36 hours with shock, absent femoral pulses, severe acidosis. Hypoplastic LV. PGE1 started. Expected adverse effect?", options: ["Hypertension", "Apnea", "Bradycardia", "Hyperglycemia", "Thrombocytosis"], correct: 1, explanation: "Apnea occurs in 10-20% on PGE1, especially at higher doses. Requires ICU monitoring." },
+      { id: 21, module: "Module 8", stem: "Newborn with murmur, micrognathia, cleft palate, hypocalcemia, reduced CD3+ T cells. Genetic abnormality?", options: ["Trisomy 21", "45,X", "22q11.2 deletion", "7q11.23 deletion", "PTPN11"], correct: 2, explanation: "22q11.2 deletion (DiGeorge): CATCH-22 - Cardiac, Abnormal facies, Thymic hypoplasia, Hypocalcemia." },
+      { id: 22, module: "Module 8", stem: "Pregnant woman with poorly controlled diabetes delivers at term. Which CHD most associated with maternal diabetes?", options: ["VSD", "Transposition", "ASD", "Coarctation", "TOF"], correct: 1, explanation: "Transposition shows strongest association, 2-3x more frequent in infants of diabetic mothers." },
+      { id: 23, module: "Module 3", stem: "Six-month-old with cyanosis and boot-shaped heart on CXR. Parental maneuver to improve oxygenation?", options: ["Supine", "Standing", "Knee-chest position", "Prone", "Right side lying"], correct: 2, explanation: "Knee-chest increases SVR, reducing right-to-left shunt in TOF." },
+      { id: 24, module: "Module 4", stem: "Cyanotic newborn with egg-on-a-string on CXR. Most characteristic finding?", options: ["Increased pulmonary markings", "Boot-shaped heart", "Rib notching", "Snowman sign", "Figure-three sign"], correct: 0, explanation: "Egg-on-a-string is pathognomonic for TGA. Increased markings occur with TGA plus large VSD." },
+      { id: 25, module: "Module 1", stem: "Neural crest cells migrate into outflow tract during weeks 5-7. Deficiency predisposes to which group?", options: ["ASDs", "Muscular VSDs", "Conotruncal defects", "AV valve abnormalities", "Coronary anomalies"], correct: 2, explanation: "Conotruncal defects (truncus, TOF, TGA, IAA) result from neural crest abnormalities." },
+      { id: 26, module: "Module 5", stem: "19-year-old with unrepaired large PDA has exercise intolerance, lower extremity cyanosis only. Explanation?", options: ["PDA closed", "PVR exceeds SVR", "LV failure", "PE", "Endocarditis"], correct: 1, explanation: "Differential cyanosis in Eisenmenger PDA is pathognomonic for shunt reversal." },
+      { id: 27, module: "Module 6", stem: "Infant with CHD and trisomy 21. ECG shows QRS axis -50°, first-degree AV block, biventricular hypertrophy. Diagnosis?", options: ["Secundum ASD", "Complete AVSD", "VSD", "TOF", "PDA"], correct: 1, explanation: "Superior leftward axis is virtually pathognomonic for AVSD in Down syndrome." },
+      { id: 28, module: "Module 7", stem: "Neonate with HLHS on PGE1. What ventilation strategy balances pulmonary and systemic flow?", options: ["Max O2 for SpO2>95%", "Hyperventilation", "Hypoventilation with modest hypercapnia", "PEEP 15", "High tidal volumes"], correct: 2, explanation: "Oxygen and hyperventilation lower PVR worsening imbalance. Goal is SpO2 75-85% with modest CO2." },
+      { id: 29, module: "Module 8", stem: "Pregnant woman on isotretinoin for severe acne. Most characteristic CHD?", options: ["ASD", "Truncus arteriosus", "Ebstein", "Bicuspid aortic", "AVSD"], correct: 1, explanation: "Retinoic acid exposure causes conotruncal defects including truncus, TGA, TOF." },
+      { id: 30, module: "Module 2", stem: "During fetal life, which structure allows oxygenated umbilical blood to bypass liver and enter IVC?", options: ["Foramen ovale", "Ductus arteriosus", "Ductus venosus", "Ligamentum teres", "Portal vein"], correct: 2, explanation: "Ductus venosus connects umbilical vein to IVC, bypassing hepatic circulation." },
+      { id: 31, module: "Module 3", stem: "Four-month-old with continuous murmur, cardiomegaly, increased pulmonary markings. Prominent ascending aorta. Expected finding?", options: ["Differential cyanosis", "Wide pulse pressure with bounding pulses", "Weak femoral pulses", "Fixed split S2", "Pulsus paradoxus"], correct: 1, explanation: "PDA causes wide pulse pressure and bounding pulses from diastolic runoff." },
+      { id: 32, module: "Module 4", stem: "Patient A: boot-shaped heart, decreased markings. Patient B: egg-on-a-string. Key physiologic difference?", options: ["A increased flow, B decreased", "A has obstruction, B has parallel circulations", "Both RV level shunts", "A needs PGE1, B doesn't", "Both single ventricle"], correct: 1, explanation: "TOF (A) has obstruction limiting pulmonary flow; TGA (B) has parallel circulations." },
+      { id: 33, module: "Module 6", stem: "Newborn passes pulse oximetry screening at 24 hours. At 3 days presents with shock and absent femoral pulses. Why missed?", options: ["Early screening", "Left-sided obstruction without hypoxemia", "Oximeter error", "Acquired postnatal", "Need both arms"], correct: 1, explanation: "Coarctation doesn't cause hypoxemia. Screening has ~50% false-negative rate for coarctation." },
+      { id: 34, module: "Module 8", stem: "Four-year-old with developmental delay, overly friendly, broad forehead. Systolic murmur at right upper sternal border. Right arm BP higher. Genetic defect?", options: ["Trisomy 21", "22q11.2 deletion", "7q11.23 deletion", "45,X", "PTPN11"], correct: 2, explanation: "Williams syndrome (7q11.23): supravalvar aortic stenosis, elfin facies, friendly personality." },
+      { id: 35, module: "Module 3", stem: "Six-month-old with small muscular VSD and loud holosystolic murmur. At 2 years, murmur absent. Explanation?", options: ["Enlarged", "Eisenmenger", "Spontaneous closure", "LV failure", "PHT"], correct: 2, explanation: "Small muscular VSDs close spontaneously in 50-70% by age 2-3 years." },
+      { id: 36, module: "Module 8", stem: "Newborn with massive cardiomegaly, box-shaped silhouette. ECG shows tall P waves, prolonged PR. Mother on lithium. Diagnosis?", options: ["Valproic effect", "Lithium effect", "Carbamazepine", "Lamotrigine", "SSRI"], correct: 1, explanation: "Maternal lithium first trimester increases Ebstein anomaly risk 10-400 fold." },
+      { id: 37, module: "Module 5", stem: "Child with TOF squats frequently after playing. What hemodynamic change occurs?", options: ["Decreased SVR", "Increased PVR", "Increased R-to-L shunt", "Increased SVR", "Decreased venous return"], correct: 3, explanation: "Squatting increases SVR, reducing RV pressure and decreasing right-to-left shunt." },
+      { id: 38, module: "Module 1", stem: "Key feature distinguishing TAPVR from PAPVR?", options: ["Fixed split S2", "Obligatory right-to-left shunt with cyanosis", "Increased markings", "RV overload", "Sinus venosus ASD association"], correct: 1, explanation: "TAPVR has obligatory R-to-L shunt at ASD. PAPVR has some normal veins, no cyanosis." },
+      { id: 39, module: "Module 4", stem: "Six-week-old with mild cyanosis, single loud S2, bounding pulses. Increased markings, widened mediastinum. Echo finding?", options: ["Large VSD", "Single arterial trunk", "Aorta from RV", "Absent tricuspid", "All PVs to RA"], correct: 1, explanation: "Increased markings plus cyanosis indicates truncus. Single trunk with pulmonary branches." },
+      { id: 40, module: "Module 7", stem: "Neonate at 18 hours with shock, absent femoral pulses, severe acidosis. Unobtainable leg BP. Intervention?", options: ["Indomethacin", "Prostaglandin E1", "Furosemide", "Digoxin", "Surgical consult"], correct: 1, explanation: "Ductal-dependent systemic circulation. PGE1 lifesaving by maintaining ductus arteriosus." },
+      { id: 41, module: "Module 3", stem: "Infant with large restrictive ASD has normal physical exam and no murmur. Why?", options: ["ASD does not produce murmurs", "Flow across ASD is minimal in infancy", "Defect closed spontaneously", "ASD produces only diastolic murmurs", "Pulmonary stenosis masks the murmur"], correct: 1, explanation: "Large restrictive ASD in infancy: PVR still elevated, minimal left-to-right shunt, no murmur develops until PVR falls." },
+      { id: 42, module: "Module 4", stem: "Newborn with tricuspid atresia has severe cyanosis at birth. What is the obligatory pathway for pulmonary blood flow?", options: ["Through PDA only", "Through ASD only", "Through both PDA and ASD", "Through VSD only", "Pulmonary veins directly to systemic circulation"], correct: 2, explanation: "Tricuspid atresia requires both ASD (for right-to-left shunt) and PDA (for pulmonary blood flow). Both are obligatory." },
+      { id: 43, module: "Module 2", stem: "Fetal ductus venosus preferentially directs well-oxygenated umbilical blood where?", options: ["Right atrium only", "Left atrium only", "Through foramen ovale to left atrium", "Equally to both ventricles", "To the coronary circulation"], correct: 2, explanation: "Ductus venosus blood bypasses liver, enters IVC, flows to RA, then preferentially through foramen ovale to LA." },
+      { id: 44, module: "Module 5", stem: "Adult with unrepaired secundum ASD develops atrial fibrillation. What mechanism explains this?", options: ["Increased LV afterload", "RV volume overload causing atrial stretch", "Mitral regurgitation", "Coronary steal", "Pulmonary hypertension alone"], correct: 1, explanation: "Chronic RV volume overload stretches atria, creating substrate for atrial fibrillation and atrial arrhythmias." },
+      { id: 45, module: "Module 6", stem: "Newborn with suspected critical CHD. Which finding on ECG would most suggest anomalous coronary origin?", options: ["Profound ST elevation", "Deep Q waves in lateral leads", "Left axis deviation", "No specific ECG pattern", "Right axis deviation"], correct: 3, explanation: "Anomalous left coronary from right coronary sinus can present with sudden death in infants; no pathognomonic ECG but high suspicion warranted." },
+      { id: 46, module: "Module 3", stem: "Infant with moderate-sized muscular VSD. Progressive LV dilation noted on serial echos. Expected consequence if not closed?", options: ["Spontaneous closure by age 5", "Eisenmenger syndrome development", "Left heart failure from volume overload", "Endocarditis protective effect", "Improved symptoms over time"], correct: 2, explanation: "Moderate VSDs can cause progressive LV volume overload, eccentric hypertrophy, and eventual systolic dysfunction if not intervened." },
+      { id: 47, module: "Module 4", stem: "Infant with total anomalous pulmonary venous return (cardiac type) has what distinguishing feature?", options: ["Pulmonary veins drain to right atrium directly", "Pulmonary veins drain to coronary sinus", "Snowman sign on CXR", "Decreased pulmonary blood flow", "Left axis deviation on ECG"], correct: 1, explanation: "Cardiac TAPVR: pulmonary veins drain to coronary sinus, representing the least common but still important subtype." },
+      { id: 48, module: "Module 8", stem: "Infant with CATCH-22 features presents with tetralogy of Fallot and cardiac outflow obstruction. What gene encodes the transcription factor responsible?", options: ["Elastin gene", "GATA4", "TBX1", "PTPN11", "FBN1"], correct: 2, explanation: "TBX1 deletion in 22q11.2 is responsible for conotruncal abnormalities in DiGeorge syndrome." },
+      { id: 49, module: "Module 5", stem: "Patient with longstanding PDA and Eisenmenger syndrome. Biopsy shows proliferative pulmonary arterial disease. What mechanism explains irreversibility?", options: ["Muscular hypertrophy only", "Intimal fibrosis and medial hypertrophy", "Endothelial dysfunction alone", "Increased prostaglandins", "Decreased nitric oxide"], correct: 1, explanation: "Chronic high-flow, high-pressure pulmonary circulation causes intimal proliferation and medial remodeling that becomes fixed." },
+      { id: 50, module: "Module 6", stem: "CXR in child with atrial septal defect shows what classic finding?", options: ["Cardiomegaly with decreased pulmonary markings", "Cardiomegaly with increased pulmonary markings", "Boot-shaped heart", "Egg-on-a-string", "Straightened left heart border"], correct: 1, explanation: "ASD: RV volume overload causes cardiomegaly; increased pulmonary blood flow causes increased pulmonary vascular markings." },
+      { id: 51, module: "Module 3", stem: "Premature infant on mechanical ventilation with PDA. How does positive pressure ventilation affect ductus patency?", options: ["Promotes ductal closure", "Increases PVR, reducing left-to-right shunt", "Increases SVR, worsening shunt", "Has no effect on ductus", "Decreases SVR, increasing shunt"], correct: 1, explanation: "Mechanical ventilation increases intrathoracic pressure and PVR, paradoxically reducing left-to-right shunt through PDA." },
+      { id: 52, module: "Module 2", stem: "In fetal life, what percentage of right ventricular output crosses the ductus arteriosus to the descending aorta?", options: ["25 percent", "50 percent", "75 percent", "90 percent", "Negligible amount"], correct: 3, explanation: "Approximately 90% of RV output bypasses high-resistance fetal lungs via ductus arteriosus to supply lower body and placenta." },
+      { id: 53, module: "Module 4", stem: "Neonate with severe cyanosis has balloon atrial septostomy performed (Rashkind procedure). What is the mechanism of improved oxygenation?", options: ["Increases pulmonary blood flow", "Creates ASD for mixing of circulations", "Closes PDA", "Improves cardiac output", "Reduces pulmonary vascular resistance"], correct: 1, explanation: "Rashkind procedure creates or enlarges ASD, improving mixing of oxygenated and deoxygenated blood." },
+      { id: 54, module: "Module 7", stem: "Infant with PDA on indomethacin therapy. Oliguria develops with rising creatinine. Most likely mechanism?", options: ["Direct nephrotoxicity", "Decreased renal perfusion from reduced cardiac output", "Hyperkalemia effect", "Fluid overload", "Sepsis"], correct: 1, explanation: "Indomethacin reduces prostaglandin synthesis, decreasing renal blood flow and GFR, especially in premature infants." },
+      { id: 55, module: "Module 8", stem: "Infant with Noonan syndrome (PTPN11 mutation) presents with cardiac findings. Most common cardiac manifestation?", options: ["Transposition", "Pulmonic stenosis", "Truncus arteriosus", "Hypoplastic left heart", "Tricuspid atresia"], correct: 1, explanation: "Noonan syndrome characteristically presents with pulmonic stenosis and hypertrophic cardiomyopathy." },
+      { id: 56, module: "Module 1", stem: "Failure of the pleuroperitoneal membrane to fuse during embryogenesis results in what cardiac sequela?", options: ["Atrial septal defect", "Ventricular septal defect", "Pericardial defect", "Cardiac displacement from diaphragmatic hernia", "Endocardial cushion defect"], correct: 3, explanation: "Diaphragmatic defects allow herniation of abdominal contents, potentially affecting cardiac position and development." },
+      { id: 57, module: "Module 5", stem: "Adult with secundum ASD and pulmonary hypertension undergoes exercise stress testing. Expected response?", options: ["Normal oxygen saturation maintenance", "Systemic desaturation from worsening right-to-left shunt", "Minimal change in pulmonary pressures", "Sudden drop in blood pressure", "Resolution of shunt"], correct: 1, explanation: "Exercise increases SVR and RV afterload, potentially reversing shunt to right-to-left in ASD with PHT." },
+      { id: 58, module: "Module 3", stem: "Infants with Down syndrome who require cardiac surgery for AVSD have increased perioperative risk. Why?", options: ["Excessive bleeding from thrombocytopenia", "Immune deficiency from thymic hypoplasia", "Anatomic complexity of septal defect", "Associated pulmonary hypoplasia", "Increased susceptibility to infection and airway abnormalities"], correct: 4, explanation: "Down syndrome: increased perioperative risk from airway abnormalities, immune dysfunction, and increased infection susceptibility." },
+      { id: 59, module: "Module 6", stem: "Chest radiograph of child with Tetralogy of Fallot shows rib notching. What causes this?", options: ["Collateral intercostal arteries", "Rib hypoplasia", "Prior surgeries creating collaterals", "Right aortic arch effect", "Increased ventricular pressure transmitted to ribs"], correct: 2, explanation: "Rib notching in TOF results from prior systemic-to-pulmonary shunt surgeries (Blalock-Taussig) with enlarged collateral vessels." },
+      { id: 60, module: "Module 4", stem: "Hypoplastic left heart syndrome. Which of these is necessary for neonatal survival?", options: ["Patent foramen ovale only", "Patent ductus arteriosus only", "Both PFO and PDA", "Atrial septal defect only", "Large ventricular septal defect"], correct: 2, explanation: "HLHS requires both PDA (for systemic output) and ASD (for pulmonary return and mixing). Both are obligatory." },
+      { id: 61, module: "Module 2", stem: "How does closure of umbilical arteries and vein affect fetal circulation after birth?", options: ["Eliminates placental circulation", "Increases systemic vascular resistance", "Decreases right atrial pressure", "Eliminates need for foramen ovale shunting", "All of the above"], correct: 4, explanation: "Cord clamping eliminates low-resistance placental circulation, increasing SVR and reducing right atrial pressure." },
+      { id: 62, module: "Module 7", stem: "Prostaglandin E1 causes vasodilation in which vascular bed most relevant to ductal patency?", options: ["Systemic circulation", "Pulmonary circulation", "Coronary circulation", "Ductal smooth muscle directly", "Mesenteric circulation"], correct: 3, explanation: "PGE1 acts directly on ductal smooth muscle to cause relaxation and maintain patency." },
+      { id: 63, module: "Module 5", stem: "Long-standing mitral regurgitation from cleft mitral valve in AVSD leads to what chamber change?", options: ["Left atrial enlargement", "Left ventricular dilation", "Right ventricular hypertrophy", "Both LA and LV abnormalities", "Unchanged chamber size"], correct: 3, explanation: "MR causes LA volume overload and LV volume overload, leading to eccentric hypertrophy of both chambers." },
+      { id: 64, module: "Module 6", stem: "Fetal echocardiography at 20 weeks shows single outflow tract and suspected truncus arteriosus. Associated chromosomal finding?", options: ["Trisomy 21", "Turner syndrome", "22q11.2 deletion", "Trisomy 18", "45,X/46,XX mosaicism"], correct: 2, explanation: "Truncus arteriosus is strongly associated with 22q11.2 deletion (DiGeorge syndrome)." },
+      { id: 65, module: "Module 3", stem: "Ventricular septal defect with left-to-right shunt produces what change in pulmonary blood flow?", options: ["Decreased pulmonary flow", "Normal pulmonary flow only through PA", "Increased total pulmonary flow (both lungs)", "Shunt blood bypasses lungs", "No change in pulmonary circulation"], correct: 2, explanation: "Left-to-right VSD shunt adds to normal pulmonary flow, increasing total pulmonary vascular flow and causing overcirculation." },
+      { id: 66, module: "Module 8", stem: "Maternal phenylketonuria (PKU) with poor dietary control. What cardiac defects are increased in offspring?", options: ["Transposition", "Tetralogy of Fallot", "Patent ductus arteriosus", "Coarctation of aorta", "All of the above"], correct: 3, explanation: "Maternal hyperphenylalaninemia causes fetal cardiac defects, with coarctation and complex lesions most common." },
+      { id: 67, module: "Module 4", stem: "Infant with critical pulmonary stenosis. How does decreased pulmonary blood flow affect fetal survival?", options: ["Fetus survives if ASD present for right-to-left shunt", "Fetus survives if PDA present for pulmonary flow", "Fetus survives via mixture of both shunts", "Fetus has severe intrauterine growth restriction", "In utero lethality common"], correct: 2, explanation: "Critical PS requires both ASD (for systemic blood return) and PDA (for pulmonary flow) for intrauterine survival." },
+      { id: 68, module: "Module 5", stem: "Untreated large VSD without Eisenmenger develops what?", options: ["Progressive LV failure", "Spontaneous closure by 10", "Stable normal life", "Progressive RV failure", "Endocarditis"], correct: 0, explanation: "Large VSD without Eisenmenger causes progressive LV volume overload and systolic dysfunction." },
+      { id: 69, module: "Module 1", stem: "Secondary atrial septum forms from which structure?", options: ["First septum", "Endocardial cushion", "Sinus venosus", "Right valve of sinus venosus", "Fossa ovalis"], correct: 3, explanation: "Septum secundum forms as right valve of sinus venosus creating fossa ovalis." },
+      { id: 70, module: "Module 6", stem: "Newborn with SpO2 88% bilaterally despite supplemental oxygen. Next step?", options: ["Repeat measure", "Get ABG", "Echocardiography", "Apply CPAP", "Cardiac center"], correct: 2, explanation: "SpO2 88% despite oxygen warrants urgent echocardiography for critical cyanotic CHD." }
+    ];
+
+    // ---------------------- STATE ----------------------
+    let currentIndex = 0;
+    let displayedQuestions = [...questions];
+    let questionStats = {};
+    let flaggedQuestions = new Set();
+    let startTime = Date.now();
+    let timerInterval;
+
+    // Initialize stats for all
+    questions.forEach(q => {
+      questionStats[q.id] = { answered: false, correct: false, time: 0, selected: undefined };
+    });
+
+    // ---------------------- HELPERS ----------------------
+    function updateStats() {
+      const answered = Object.values(questionStats).filter(s => s.answered).length;
+      const correct = Object.values(questionStats).filter(s => s.correct).length;
+      document.getElementById('current').textContent = currentIndex + 1;
+      document.getElementById('total').textContent = displayedQuestions.length;
+      document.getElementById('correctCount').textContent = correct;
+      document.getElementById('incorrectCount').textContent = answered - correct;
+      document.getElementById('accuracy').textContent = answered > 0 ? Math.round((correct / answered) * 100) + '%' : '-';
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      startTime = Date.now();
+      timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        document.getElementById('timeDisplay').textContent = `Time: ${elapsed}s`;
+      }, 100);
+    }
+
+    function updateFlagButton() {
+      const q = displayedQuestions[currentIndex];
+      const flagBtn = document.getElementById('flagBtn');
+      if (flaggedQuestions.has(q.id)) {
+        flagBtn.style.background = '#fbbf24';
+        flagBtn.style.color = '#000';
+        flagBtn.textContent = '⭐ Flagged';
+      } else {
+        flagBtn.style.background = '#f3f4f6';
+        flagBtn.style.color = '#333';
+        flagBtn.textContent = '☆ Flag';
+      }
+    }
+
+    function updateNavigationButtons() {
+      document.getElementById('prevBtn').disabled = currentIndex === 0;
+    }
+
+    function renderOptions(q) {
+      return q.options.map((opt, idx) => {
+        let optClass = 'option';
+        if (questionStats[q.id].answered) {
+          if (idx === q.correct) optClass += ' correct';
+          else if (idx === questionStats[q.id].selected) optClass += ' incorrect';
+          optClass += ' disabled';
+        }
+        if (questionStats[q.id].selected === idx && !questionStats[q.id].answered) {
+          optClass += ' selected';
+        }
+        return `
+          <div class="${optClass}" role="button" tabindex="0" onclick="selectOption(${idx})" onkeydown="if(event.key==='Enter' || event.key===' ') selectOption(${idx})">
+            <div class="option-letter">${String.fromCharCode(65 + idx)}</div>
+            <div class="option-text">${opt}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ---------------------- UI CORE ----------------------
+    function displayQuestion() {
+      clearInterval(timerInterval);
+      const q = displayedQuestions[currentIndex];
+      startTimer();
+
+      document.getElementById('moduleBadge').textContent = q.module;
+      document.getElementById('qNumber').textContent = `Question ${currentIndex + 1} of ${displayedQuestions.length}`;
+      document.getElementById('questionStem').textContent = q.stem;
+      document.getElementById('optionsContainer').innerHTML = renderOptions(q);
+
+      const submitBtn = document.getElementById('actionBtn');
+
+      if (questionStats[q.id].answered) {
+        const isCorrect = questionStats[q.id].correct;
+        document.getElementById('explanationContainer').innerHTML = `
+          <div class="explanation ${isCorrect ? 'correct' : 'incorrect'}">
+            <div class="explanation-title">${isCorrect ? '✓ Correct' : '✗ Incorrect'}</div>
+            <div>${q.explanation}</div>
+          </div>
+        `;
+        submitBtn.disabled = false;
+        submitBtn.textContent = currentIndex === displayedQuestions.length - 1 ? 'Quiz Complete' : 'Next Question';
+      } else {
+        document.getElementById('explanationContainer').innerHTML = '';
+        submitBtn.textContent = 'Submit Answer';
+        submitBtn.disabled = (questionStats[q.id].selected === undefined);
+      }
+
+      updateFlagButton();
+      updateNavigationButtons();
+      updateStats();
+    }
+
+    function selectOption(idx) {
+      const q = displayedQuestions[currentIndex];
+      if (!questionStats[q.id].answered) {
+        questionStats[q.id].selected = idx;
+        displayQuestion();
+      }
+    }
+
+    function submitAnswer() {
+      const q = displayedQuestions[currentIndex];
+      if (questionStats[q.id].answered) {
+        goNext();
+      } else if (questionStats[q.id].selected !== undefined) {
+        const isCorrect = questionStats[q.id].selected === q.correct;
+        questionStats[q.id].answered = true;
+        questionStats[q.id].correct = isCorrect;
+        questionStats[q.id].time = Math.floor((Date.now() - startTime) / 1000);
+        displayQuestion();
+      }
+    }
+
+    function goNext() {
+      if (currentIndex < displayedQuestions.length - 1) {
+        currentIndex++;
+        displayQuestion();
+      }
+    }
+
+    function goPrev() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        displayQuestion();
+      }
+    }
+
+    function toggleFlag() {
+      const q = displayedQuestions[currentIndex];
+      if (flaggedQuestions.has(q.id)) {
+        flaggedQuestions.delete(q.id);
+      } else {
+        flaggedQuestions.add(q.id);
+      }
+      updateFlagButton();
+    }
+
+    function shuffleQuestions() {
+      displayedQuestions.sort(() => Math.random() - 0.5);
+      currentIndex = 0;
+      displayQuestion();
+    }
+
+    function resetQuiz() {
+      if (confirm('Reset all progress? This cannot be undone.')) {
+        questionStats = {};
+        questions.forEach(q => {
+          questionStats[q.id] = { answered: false, correct: false, time: 0, selected: undefined };
+        });
+        displayedQuestions = [...questions];
+        currentIndex = 0;
+        flaggedQuestions.clear();
+        displayQuestion();
+      }
+    }
+
+    function filterQuestions() {
+      const module = document.getElementById('moduleFilter').value;
+      const flagged = document.getElementById('flagToggle').checked;
+
+      displayedQuestions = questions.filter(q => {
+        const matchModule = !module || q.module.includes(module);
+        const matchFlag = !flagged || flaggedQuestions.has(q.id);
+        return matchModule && matchFlag;
+      });
+
+      if (displayedQuestions.length === 0) {
+        displayedQuestions = questions;
+        alert('No questions match this filter.');
+      }
+      currentIndex = 0;
+      displayQuestion();
+    }
+
+    // ---------- Review modal ----------
+    function openReview(allOrWrong = 'all') {
+      const container = document.getElementById('reviewBody');
+      container.innerHTML = '';
+
+      const entries = Object.entries(questionStats)
+        .filter(([id, stat]) => stat.answered)
+        .filter(([id, stat]) => (allOrWrong === 'wrong' ? !stat.correct : true))
+        .map(([id, stat]) => {
+          const q = questions.find(x => x.id == id);
+          return { q, stat };
+        });
+
+      if (!entries.length) {
+        container.innerHTML = '<p style="padding:8px 0;">No questions to review yet.</p>';
+      } else {
+        entries.sort((a, b) => a.q.id - b.q.id).forEach(({ q, stat }) => {
+          const preview = q.stem.length > 100 ? q.stem.slice(0, 100) + '…' : q.stem;
+          const badge = stat.correct ? '<span class="badge-correct">✓ Correct</span>' : '<span class="badge-incorrect">✗ Incorrect</span>';
+          container.innerHTML += `
+            <div class="review-item">
+              <strong>Q${q.id}</strong> ${badge}<br />
+              ${preview}
+            </div>
+          `;
+        });
+      }
+
+      document.getElementById('reviewDialog').showModal();
+    }
+
+    function closeReview() {
+      document.getElementById('reviewDialog').close();
+    }
+
+    // ---------------------- EVENTS ----------------------
+    document.getElementById('actionBtn').addEventListener('click', submitAnswer);
+    document.getElementById('prevBtn').addEventListener('click', goPrev);
+    document.getElementById('flagBtn').addEventListener('click', toggleFlag);
+    document.getElementById('shuffleBtn').addEventListener('click', shuffleQuestions);
+    document.getElementById('resetBtn').addEventListener('click', resetQuiz);
+    document.getElementById('reviewBtn').addEventListener('click', () => openReview('all'));
+    document.getElementById('moduleFilter').addEventListener('change', filterQuestions);
+    document.getElementById('flagToggle').addEventListener('change', filterQuestions);
+
+    document.getElementById('closeReview').addEventListener('click', closeReview);
+    document.getElementById('reviewFilterAll').addEventListener('click', () => openReview('all'));
+    document.getElementById('reviewFilterWrong').addEventListener('click', () => openReview('wrong'));
+
+    // Keyboard shortcuts: Left/Right for prev/next, Enter to submit
+    document.addEventListener('keydown', (e) => {
+      const tag = e.target.tagName.toLowerCase();
+      if (tag === 'input' || tag === 'select' || tag === 'textarea') return;
+      if (e.key === 'ArrowLeft') goPrev();
+      if (e.key === 'ArrowRight') goNext();
+      if (e.key === 'Enter') submitAnswer();
+    });
+
+    // Initial render
+    document.getElementById('qCount').textContent = questions.length;
+    document.getElementById('total').textContent = questions.length;
+    displayQuestion();
+  </script>
+</body>
+</html>
