@@ -26,14 +26,22 @@ final class QBURLSchemeHandler: NSObject, WKURLSchemeHandler {
             urlSchemeTask.didFailWithError(DirectoryError.invalidPath)
             return
         }
-        let fileURL = directory.appendingPathComponent(filename)
-        guard FileManager.default.fileExists(atPath: fileURL.path) else {
+        let resolvedDirectory = directory.resolvingSymlinksInPath()
+        let candidateURL = resolvedDirectory.appendingPathComponent(filename)
+        let resolvedFileURL = candidateURL.resolvingSymlinksInPath()
+        let directoryPath = resolvedDirectory.path
+        let requiredPrefix = directoryPath.hasSuffix("/") ? directoryPath : directoryPath + "/"
+        guard resolvedFileURL.path.hasPrefix(requiredPrefix) else {
+            urlSchemeTask.didFailWithError(DirectoryError.invalidPath)
+            return
+        }
+        guard FileManager.default.fileExists(atPath: resolvedFileURL.path) else {
             urlSchemeTask.didFailWithError(DirectoryError.invalidPath)
             return
         }
         do {
-            let data = try Data(contentsOf: fileURL)
-            let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: ["Content-Type": mimeType(for: fileURL)])
+            let data = try Data(contentsOf: resolvedFileURL)
+            let response = HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: ["Content-Type": mimeType(for: resolvedFileURL)])
             urlSchemeTask.didReceive(response!)
             urlSchemeTask.didReceive(data)
             urlSchemeTask.didFinish()
