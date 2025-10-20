@@ -11,11 +11,8 @@ objects = {
 1F16F1032BE5707B00C0D5A1 /* WebViewBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F16F0F42BE5707B00C0D5A1 /* WebViewBridge.swift */; };
 1F16F1042BE5707B00C0D5A1 /* QBURLSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F16F0F52BE5707B00C0D5A1 /* QBURLSchemeHandler.swift */; };
 1F16F1052BE5707B00C0D5A1 /* DirectoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F16F0F62BE5707B00C0D5A1 /* DirectoryHelper.swift */; };
-1F16F10E2BE570C200C0D5A1 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = 1F16F10A2BE570C200C0D5A1 /* index.html */; };
-1F16F10F2BE570C200C0D5A1 /* styles.css in Resources */ = {isa = PBXBuildFile; fileRef = 1F16F10B2BE570C200C0D5A1 /* styles.css */; };
-1F16F1102BE570C200C0D5A1 /* app.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F16F10C2BE570C200C0D5A1 /* app.js */; };
-1F16F1112BE570C200C0D5A1 /* hash.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F16F10D2BE570C200C0D5A1 /* hash.js */; };
-1F16F1142BE5710900C0D5A1 /* items.json in Resources */ = {isa = PBXBuildFile; fileRef = 1F16F1132BE5710900C0D5A1 /* items.json */; };
+1F16F10E2BE570C200C0D5A1 /* Resources in Resources */ = {isa = PBXBuildFile; fileRef = 1F16F1092BE570C200C0D5A1 /* Resources */; };
+1F16F1142BE5710900C0D5A1 /* Seed in Resources */ = {isa = PBXBuildFile; fileRef = 1F16F1122BE5710900C0D5A1 /* Seed */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,11 +23,8 @@ objects = {
 1F16F0F52BE5707B00C0D5A1 /* QBURLSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QBURLSchemeHandler.swift; sourceTree = "<group>"; };
 1F16F0F62BE5707B00C0D5A1 /* DirectoryHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoryHelper.swift; sourceTree = "<group>"; };
 1F16F0F92BE570C900C0D5A1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-1F16F10A2BE570C200C0D5A1 /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
-1F16F10B2BE570C200C0D5A1 /* styles.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = styles.css; sourceTree = "<group>"; };
-1F16F10C2BE570C200C0D5A1 /* app.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = app.js; sourceTree = "<group>"; };
-1F16F10D2BE570C200C0D5A1 /* hash.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = hash.js; path = lib/hash.js; sourceTree = "<group>"; };
-1F16F1132BE5710900C0D5A1 /* items.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = items.json; path = Seed/items.json; sourceTree = "<group>"; };
+1F16F1092BE570C200C0D5A1 /* Resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Resources; sourceTree = "<group>"; };
+1F16F1122BE5710900C0D5A1 /* Seed */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Seed; sourceTree = "<group>"; };
 1F16F1152BE5714900C0D5A1 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -75,25 +69,6 @@ children = (
 1F16F0F92BE570C900C0D5A1 /* Info.plist */,
 );
 path = App;
-sourceTree = "<group>";
-};
-1F16F1092BE570C200C0D5A1 /* Resources */ = {
-isa = PBXGroup;
-children = (
-1F16F10A2BE570C200C0D5A1 /* index.html */,
-1F16F10B2BE570C200C0D5A1 /* styles.css */,
-1F16F10C2BE570C200C0D5A1 /* app.js */,
-1F16F10D2BE570C200C0D5A1 /* hash.js */,
-);
-path = Resources;
-sourceTree = "<group>";
-};
-1F16F1122BE5710900C0D5A1 /* Seed */ = {
-isa = PBXGroup;
-children = (
-1F16F1132BE5710900C0D5A1 /* items.json */,
-);
-path = Seed;
 sourceTree = "<group>";
 };
 /* End PBXGroup section */
@@ -154,11 +129,8 @@ targets = (
 isa = PBXResourcesBuildPhase;
 buildActionMask = 2147483647;
 files = (
-1F16F10E2BE570C200C0D5A1 /* index.html in Resources */,
-1F16F10F2BE570C200C0D5A1 /* styles.css in Resources */,
-1F16F1102BE570C200C0D5A1 /* app.js in Resources */,
-1F16F1112BE570C200C0D5A1 /* hash.js in Resources */,
-1F16F1142BE5710900C0D5A1 /* items.json in Resources */,
+        1F16F10E2BE570C200C0D5A1 /* Resources in Resources */,
+        1F16F1142BE5710900C0D5A1 /* Seed in Resources */,
 );
 runOnlyForDeploymentPostprocessing = 0;
 };
