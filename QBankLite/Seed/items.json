@@ -1,0 +1,92 @@
+[
+  {
+    "id": "2b1f73b8-5a3d-4f36-8d8d-0a3f1b235901",
+    "stem": "A 65-year-old man with a history of smoking presents with progressive shortness of breath. Which imaging finding on the provided chest radiograph most strongly supports a diagnosis of COPD?",
+    "choices": [
+      "Flattened diaphragms",
+      "Kerley B lines",
+      "Pleural effusion",
+      "Consolidation of the right middle lobe",
+      "Pneumothorax"
+    ],
+    "answer_key": "A",
+    "explanation": "Chronic obstructive pulmonary disease (COPD) is characterized by airflow limitation that is not fully reversible and is often associated with an enhanced chronic inflammatory response in the airways and lung parenchyma. Hyperinflation is a typical imaging finding, and flattening of the diaphragms is one of the most recognizable radiographic markers of hyperinflation. In the setting of longstanding smoking history and progressive dyspnea, flattened diaphragms correlate with overdistended lungs due to loss of elastic recoil in emphysema. Kerley B lines and pleural effusions are more suggestive of interstitial edema from congestive heart failure. Right middle lobe consolidation points toward pneumonia, while pneumothorax would present with a visible pleural line and absent lung markings distally. Recognizing diaphragm flattening can therefore help quickly differentiate COPD from other causes of dyspnea in the appropriate clinical context.",
+    "tags": ["pulmonology", "radiology"],
+    "difficulty": 3,
+    "references": ["GOLD Guidelines 2023"],
+    "image": "sample_cxr.png",
+    "audio": null
+  },
+  {
+    "id": "1f6ac9a7-5ab9-4d25-a0a4-c329e95ddf4d",
+    "stem": "A 28-year-old woman develops a new holosystolic murmur at the left lower sternal border after giving birth. Which finding on auscultation audio is most consistent with tricuspid regurgitation?",
+    "choices": [
+      "High-pitched blowing murmur that increases with inspiration",
+      "Low-frequency rumble with opening snap",
+      "Crescendo-decrescendo systolic murmur radiating to carotids",
+      "Continuous machine-like murmur",
+      "Early diastolic decrescendo murmur"
+    ],
+    "answer_key": "A",
+    "explanation": "Tricuspid regurgitation results in a holosystolic murmur best heard at the left lower sternal border that increases with inspiration due to augmented venous return (Carvallo sign). Postpartum women can experience transient tricuspid regurgitation from volume shifts and right ventricular dilation. The provided audio clip highlights a high-pitched blowing quality that becomes louder with inspiration, matching the expected physiologic response. An opening snap with low rumble suggests mitral stenosis, while a crescendo-decrescendo murmur radiating to the carotids is typical of aortic stenosis. A machine-like murmur indicates patent ductus arteriosus, and an early diastolic decrescendo murmur is characteristic of aortic regurgitation. Recognizing the inspiratory augmentation helps distinguish right-sided regurgitant lesions from left-sided murmurs.",
+    "tags": ["cardiology", "physical exam"],
+    "difficulty": 2,
+    "references": ["Bates' Guide to Physical Examination"],
+    "image": null,
+    "audio": "sample_murmur.mp3"
+  },
+  {
+    "id": "ef9d955d-94c2-4a2a-8b79-3d5c5c5bf8a0",
+    "stem": "A 32-year-old man presents with acute onset fever, headache, and photophobia. Cerebrospinal fluid (CSF) analysis shows elevated opening pressure, neutrophilic predominance, low glucose, and high protein. Which organism is the most likely cause?",
+    "choices": [
+      "Neisseria meningitidis",
+      "Cryptococcus neoformans",
+      "Mycobacterium tuberculosis",
+      "Herpes simplex virus",
+      "Listeria monocytogenes"
+    ],
+    "answer_key": "A",
+    "explanation": "Acute bacterial meningitis in young adults is most commonly caused by Neisseria meningitidis. The classic CSF profile includes elevated opening pressure, neutrophil-predominant pleocytosis, decreased glucose due to bacterial metabolism, and elevated protein from increased permeability of the blood-brain barrier. Cryptococcal meningitis typically presents in immunocompromised patients with lymphocytic pleocytosis and high opening pressure, whereas Mycobacterium tuberculosis meningitis has a more chronic course with lymphocyte predominance and very low glucose. Viral meningitis such as from herpes simplex virus generally shows normal glucose and moderate lymphocytic pleocytosis. Listeria is more likely in neonates, elderly individuals, or those with impaired cell-mediated immunity. Prompt recognition of a meningococcal pattern is essential for early empiric antibiotic therapy and public health notification.",
+    "tags": ["infectious disease", "neurology"],
+    "difficulty": 4,
+    "references": ["IDSA Guidelines"],
+    "image": null,
+    "audio": null
+  },
+  {
+    "id": "5d0d1a10-00b2-4f57-9538-ef2d2246be3d",
+    "stem": "A 54-year-old woman with poorly controlled type 2 diabetes presents with burning pain and numbness in both feet. Which intervention provides the most evidence-based symptomatic relief for diabetic peripheral neuropathy?",
+    "choices": [
+      "Duloxetine",
+      "Aspirin",
+      "Glipizide",
+      "Gabapentin",
+      "Alpha-lipoic acid"
+    ],
+    "answer_key": "A",
+    "explanation": "Diabetic peripheral neuropathy often manifests as burning pain, tingling, and numbness in a stocking distribution. Duloxetine, a serotonin-norepinephrine reuptake inhibitor, is FDA-approved for neuropathic pain associated with diabetes and has high-quality evidence supporting its ability to reduce pain severity and improve function. Aspirin addresses vascular risk but does not treat neuropathy. Glipizide improves glycemic control but has no immediate effect on neuropathic pain. Gabapentin can be used off-label and is effective for some patients, but duloxetine has stronger evidence and regulatory approval for this indication. Alpha-lipoic acid is studied as an antioxidant supplement, yet data remain inconsistent. Managing glycemic control, foot care, and symptom relief with duloxetine offers a comprehensive approach to diabetic neuropathy.",
+    "tags": ["endocrinology", "neurology"],
+    "difficulty": 3,
+    "references": ["American Diabetes Association"],
+    "image": null,
+    "audio": null
+  },
+  {
+    "id": "af7c5276-e34b-4a1b-a9c8-41f5c326b1f4",
+    "stem": "A 45-year-old man complains of episodic chest discomfort relieved by rest. Stress testing reveals horizontal ST depressions at moderate workloads. Which medication provides mortality benefit in this patient with stable angina?",
+    "choices": [
+      "Sublingual nitroglycerin",
+      "Metoprolol",
+      "Diltiazem",
+      "Ranolazine",
+      "Isosorbide mononitrate"
+    ],
+    "answer_key": "B",
+    "explanation": "Beta-blockers such as metoprolol are first-line therapy for chronic stable angina and confer mortality benefit through heart rate reduction, decreased myocardial oxygen demand, and antiarrhythmic properties. Sublingual nitroglycerin offers rapid symptomatic relief but does not improve survival. Diltiazem and other non-dihydropyridine calcium channel blockers relieve symptoms, particularly when beta-blockers are contraindicated, yet they have not demonstrated mortality reduction in stable angina. Ranolazine is useful for refractory angina but lacks evidence for survival benefit. Long-acting nitrates like isosorbide mononitrate alleviate symptoms but require nitrate-free intervals and do not reduce mortality. Therefore, metoprolol best addresses both symptom control and long-term outcomes.",
+    "tags": ["cardiology", "pharmacology"],
+    "difficulty": 2,
+    "references": ["ACC/AHA Stable Ischemic Heart Disease Guideline"],
+    "image": null,
+    "audio": null
+  }
+]

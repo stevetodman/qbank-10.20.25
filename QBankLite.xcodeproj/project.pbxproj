@@ -1,0 +1,360 @@
+// !$*UTF8*$!
+{
+archiveVersion = 1;
+classes = {};
+objectVersion = 55;
+objects = {
+
+/* Begin PBXBuildFile section */
+1F16F1012BE5707B00C0D5A1 /* QBankLiteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F16F0F22BE5707B00C0D5A1 /* QBankLiteApp.swift */; };
+1F16F1022BE5707B00C0D5A1 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F16F0F32BE5707B00C0D5A1 /* ContentView.swift */; };
+1F16F1032BE5707B00C0D5A1 /* WebViewBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F16F0F42BE5707B00C0D5A1 /* WebViewBridge.swift */; };
+1F16F1042BE5707B00C0D5A1 /* QBURLSchemeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F16F0F52BE5707B00C0D5A1 /* QBURLSchemeHandler.swift */; };
+1F16F1052BE5707B00C0D5A1 /* DirectoryHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F16F0F62BE5707B00C0D5A1 /* DirectoryHelper.swift */; };
+1F16F10E2BE570C200C0D5A1 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = 1F16F10A2BE570C200C0D5A1 /* index.html */; };
+1F16F10F2BE570C200C0D5A1 /* styles.css in Resources */ = {isa = PBXBuildFile; fileRef = 1F16F10B2BE570C200C0D5A1 /* styles.css */; };
+1F16F1102BE570C200C0D5A1 /* app.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F16F10C2BE570C200C0D5A1 /* app.js */; };
+1F16F1112BE570C200C0D5A1 /* hash.js in Resources */ = {isa = PBXBuildFile; fileRef = 1F16F10D2BE570C200C0D5A1 /* hash.js */; };
+1F16F1142BE5710900C0D5A1 /* items.json in Resources */ = {isa = PBXBuildFile; fileRef = 1F16F1132BE5710900C0D5A1 /* items.json */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+1F16F0EE2BE5707B00C0D5A1 /* QBankLite.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QBankLite.app; sourceTree = BUILT_PRODUCTS_DIR; };
+1F16F0F22BE5707B00C0D5A1 /* QBankLiteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QBankLiteApp.swift; sourceTree = "<group>"; };
+1F16F0F32BE5707B00C0D5A1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+1F16F0F42BE5707B00C0D5A1 /* WebViewBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewBridge.swift; sourceTree = "<group>"; };
+1F16F0F52BE5707B00C0D5A1 /* QBURLSchemeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QBURLSchemeHandler.swift; sourceTree = "<group>"; };
+1F16F0F62BE5707B00C0D5A1 /* DirectoryHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoryHelper.swift; sourceTree = "<group>"; };
+1F16F0F92BE570C900C0D5A1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+1F16F10A2BE570C200C0D5A1 /* index.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = index.html; sourceTree = "<group>"; };
+1F16F10B2BE570C200C0D5A1 /* styles.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = styles.css; sourceTree = "<group>"; };
+1F16F10C2BE570C200C0D5A1 /* app.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = app.js; sourceTree = "<group>"; };
+1F16F10D2BE570C200C0D5A1 /* hash.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = hash.js; path = lib/hash.js; sourceTree = "<group>"; };
+1F16F1132BE5710900C0D5A1 /* items.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = items.json; path = Seed/items.json; sourceTree = "<group>"; };
+1F16F1152BE5714900C0D5A1 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+1F16F0EB2BE5707B00C0D5A1 /* Frameworks */ = {
+isa = PBXFrameworksBuildPhase;
+buildActionMask = 2147483647;
+files = (
+);
+runOnlyForDeploymentPostprocessing = 0;
+};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+1F16F0E52BE5707B00C0D5A1 = {
+isa = PBXGroup;
+children = (
+1F16F0F12BE5707B00C0D5A1 /* App */,
+1F16F1092BE570C200C0D5A1 /* Resources */,
+1F16F1122BE5710900C0D5A1 /* Seed */,
+1F16F1152BE5714900C0D5A1 /* README.md */,
+1F16F0EF2BE5707B00C0D5A1 /* Products */,
+);
+sourceTree = "<group>";
+};
+1F16F0EF2BE5707B00C0D5A1 /* Products */ = {
+isa = PBXGroup;
+children = (
+1F16F0EE2BE5707B00C0D5A1 /* QBankLite.app */,
+);
+name = Products;
+sourceTree = "<group>";
+};
+1F16F0F12BE5707B00C0D5A1 /* App */ = {
+isa = PBXGroup;
+children = (
+1F16F0F22BE5707B00C0D5A1 /* QBankLiteApp.swift */,
+1F16F0F32BE5707B00C0D5A1 /* ContentView.swift */,
+1F16F0F42BE5707B00C0D5A1 /* WebViewBridge.swift */,
+1F16F0F52BE5707B00C0D5A1 /* QBURLSchemeHandler.swift */,
+1F16F0F62BE5707B00C0D5A1 /* DirectoryHelper.swift */,
+1F16F0F92BE570C900C0D5A1 /* Info.plist */,
+);
+path = App;
+sourceTree = "<group>";
+};
+1F16F1092BE570C200C0D5A1 /* Resources */ = {
+isa = PBXGroup;
+children = (
+1F16F10A2BE570C200C0D5A1 /* index.html */,
+1F16F10B2BE570C200C0D5A1 /* styles.css */,
+1F16F10C2BE570C200C0D5A1 /* app.js */,
+1F16F10D2BE570C200C0D5A1 /* hash.js */,
+);
+path = Resources;
+sourceTree = "<group>";
+};
+1F16F1122BE5710900C0D5A1 /* Seed */ = {
+isa = PBXGroup;
+children = (
+1F16F1132BE5710900C0D5A1 /* items.json */,
+);
+path = Seed;
+sourceTree = "<group>";
+};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+1F16F0ED2BE5707B00C0D5A1 /* QBankLite */ = {
+isa = PBXNativeTarget;
+buildConfigurationList = 1F16F1072BE5707B00C0D5A1 /* Build configuration list for PBXNativeTarget "QBankLite" */;
+buildPhases = (
+1F16F0EA2BE5707B00C0D5A1 /* Sources */,
+1F16F0EB2BE5707B00C0D5A1 /* Frameworks */,
+1F16F0EC2BE5707B00C0D5A1 /* Resources */,
+);
+buildRules = (
+);
+dependencies = (
+);
+name = QBankLite;
+productName = QBankLite;
+productReference = 1F16F0EE2BE5707B00C0D5A1 /* QBankLite.app */;
+productType = "com.apple.product-type.application";
+};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+1F16F0E62BE5707B00C0D5A1 /* Project object */ = {
+isa = PBXProject;
+attributes = {
+BuildIndependentTargetsInParallel = 1;
+LastSwiftUpdateCheck = 1500;
+LastUpgradeCheck = 1500;
+ORGANIZATIONNAME = "";
+TargetAttributes = {
+1F16F0ED2BE5707B00C0D5A1 = {
+CreatedOnToolsVersion = 15.0;
+};
+};
+};
+buildConfigurationList = 1F16F0E92BE5707B00C0D5A1 /* Build configuration list for PBXProject "QBankLite" */;
+compatibilityVersion = "Xcode 13.0";
+developmentRegion = en;
+hasScannedForEncodings = 0;
+knownRegions = (
+en,
+);
+mainGroup = 1F16F0E52BE5707B00C0D5A1;
+productRefGroup = 1F16F0EF2BE5707B00C0D5A1 /* Products */;
+projectDirPath = "";
+projectRoot = "";
+targets = (
+1F16F0ED2BE5707B00C0D5A1 /* QBankLite */,
+);
+};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+1F16F0EC2BE5707B00C0D5A1 /* Resources */ = {
+isa = PBXResourcesBuildPhase;
+buildActionMask = 2147483647;
+files = (
+1F16F10E2BE570C200C0D5A1 /* index.html in Resources */,
+1F16F10F2BE570C200C0D5A1 /* styles.css in Resources */,
+1F16F1102BE570C200C0D5A1 /* app.js in Resources */,
+1F16F1112BE570C200C0D5A1 /* hash.js in Resources */,
+1F16F1142BE5710900C0D5A1 /* items.json in Resources */,
+);
+runOnlyForDeploymentPostprocessing = 0;
+};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+1F16F0EA2BE5707B00C0D5A1 /* Sources */ = {
+isa = PBXSourcesBuildPhase;
+buildActionMask = 2147483647;
+files = (
+1F16F1012BE5707B00C0D5A1 /* QBankLiteApp.swift in Sources */,
+1F16F1022BE5707B00C0D5A1 /* ContentView.swift in Sources */,
+1F16F1032BE5707B00C0D5A1 /* WebViewBridge.swift in Sources */,
+1F16F1042BE5707B00C0D5A1 /* QBURLSchemeHandler.swift in Sources */,
+1F16F1052BE5707B00C0D5A1 /* DirectoryHelper.swift in Sources */,
+);
+runOnlyForDeploymentPostprocessing = 0;
+};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+1F16F0F72BE5707B00C0D5A1 /* Debug */ = {
+isa = XCBuildConfiguration;
+buildSettings = {
+ALWAYS_SEARCH_USER_PATHS = NO;
+CLANG_ANALYZER_NONNULL = YES;
+CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+CLANG_ENABLE_MODULES = YES;
+CLANG_ENABLE_OBJC_ARC = YES;
+CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+CLANG_WARN_BOOL_CONVERSION = YES;
+CLANG_WARN_COMMA = YES;
+CLANG_WARN_CONSTANT_CONVERSION = YES;
+CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+CLANG_WARN_EMPTY_BODY = YES;
+CLANG_WARN_ENUM_CONVERSION = YES;
+CLANG_WARN_INFINITE_RECURSION = YES;
+CLANG_WARN_INT_CONVERSION = YES;
+CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+CLANG_WARN_STRICT_PROTOTYPES = YES;
+CLANG_WARN_SUSPICIOUS_MOVE = YES;
+CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+CODE_SIGN_STYLE = Automatic;
+COMBINE_HIDPI_IMAGES = YES;
+COPY_PHASE_STRIP = NO;
+CURRENT_PROJECT_VERSION = 1;
+DEVELOPMENT_TEAM = "";
+ENABLE_STRICT_OBJC_MSGSEND = YES;
+ENABLE_TESTABILITY = YES;
+GCC_C_LANGUAGE_STANDARD = gnu11;
+GCC_DYNAMIC_NO_PIC = NO;
+GCC_NO_COMMON_BLOCKS = YES;
+GCC_OPTIMIZATION_LEVEL = 0;
+GCC_PREPROCESSOR_DEFINITIONS = (
+"DEBUG=1",
+"$(inherited)",
+);
+GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+GCC_WARN_UNDECLARED_SELECTOR = YES;
+GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+GCC_WARN_UNUSED_FUNCTION = YES;
+GCC_WARN_UNUSED_VARIABLE = YES;
+MACOSX_DEPLOYMENT_TARGET = 12.0;
+MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+ONLY_ACTIVE_ARCH = YES;
+OTHER_SWIFT_FLAGS = "-DDEBUG";
+PRODUCT_NAME = "$(TARGET_NAME)";
+SDKROOT = macosx;
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+SWIFT_VERSION = 5.0;
+VERSIONING_SYSTEM = "apple-generic";
+};
+name = Debug;
+};
+1F16F0F82BE5707B00C0D5A1 /* Release */ = {
+isa = XCBuildConfiguration;
+buildSettings = {
+ALWAYS_SEARCH_USER_PATHS = NO;
+CLANG_ANALYZER_NONNULL = YES;
+CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+CLANG_ENABLE_MODULES = YES;
+CLANG_ENABLE_OBJC_ARC = YES;
+CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+CLANG_WARN_BOOL_CONVERSION = YES;
+CLANG_WARN_COMMA = YES;
+CLANG_WARN_CONSTANT_CONVERSION = YES;
+CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+CLANG_WARN_EMPTY_BODY = YES;
+CLANG_WARN_ENUM_CONVERSION = YES;
+CLANG_WARN_INFINITE_RECURSION = YES;
+CLANG_WARN_INT_CONVERSION = YES;
+CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+CLANG_WARN_STRICT_PROTOTYPES = YES;
+CLANG_WARN_SUSPICIOUS_MOVE = YES;
+CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+CODE_SIGN_STYLE = Automatic;
+COMBINE_HIDPI_IMAGES = YES;
+COPY_PHASE_STRIP = NO;
+CURRENT_PROJECT_VERSION = 1;
+DEVELOPMENT_TEAM = "";
+ENABLE_NS_ASSERTIONS = NO;
+ENABLE_STRICT_OBJC_MSGSEND = YES;
+GCC_C_LANGUAGE_STANDARD = gnu11;
+GCC_NO_COMMON_BLOCKS = YES;
+GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+GCC_WARN_UNDECLARED_SELECTOR = YES;
+GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+GCC_WARN_UNUSED_FUNCTION = YES;
+GCC_WARN_UNUSED_VARIABLE = YES;
+MACOSX_DEPLOYMENT_TARGET = 12.0;
+MTL_ENABLE_DEBUG_INFO = NO;
+PRODUCT_NAME = "$(TARGET_NAME)";
+SDKROOT = macosx;
+SWIFT_COMPILATION_MODE = wholemodule;
+SWIFT_OPTIMIZATION_LEVEL = "-O";
+SWIFT_VERSION = 5.0;
+VERSIONING_SYSTEM = "apple-generic";
+};
+name = Release;
+};
+1F16F1082BE5707B00C0D5A1 /* Debug */ = {
+isa = XCBuildConfiguration;
+buildSettings = {
+ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+CODE_SIGN_STYLE = Manual;
+COMBINE_HIDPI_IMAGES = YES;
+DEVELOPMENT_TEAM = "";
+ENABLE_HARDENED_RUNTIME = NO;
+INFOPLIST_FILE = "$(SRCROOT)/QBankLite/App/Info.plist";
+LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+MACOSX_DEPLOYMENT_TARGET = 12.0;
+PRODUCT_BUNDLE_IDENTIFIER = com.example.QBankLite;
+PRODUCT_NAME = "$(TARGET_NAME)";
+SWIFT_EMIT_LOC_STRINGS = NO;
+SWIFT_VERSION = 5.0;
+};
+name = Debug;
+};
+1F16F1092BE5707B00C0D5A1 /* Release */ = {
+isa = XCBuildConfiguration;
+buildSettings = {
+ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+CODE_SIGN_STYLE = Manual;
+COMBINE_HIDPI_IMAGES = YES;
+DEVELOPMENT_TEAM = "";
+ENABLE_HARDENED_RUNTIME = NO;
+INFOPLIST_FILE = "$(SRCROOT)/QBankLite/App/Info.plist";
+LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+MACOSX_DEPLOYMENT_TARGET = 12.0;
+PRODUCT_BUNDLE_IDENTIFIER = com.example.QBankLite;
+PRODUCT_NAME = "$(TARGET_NAME)";
+SWIFT_EMIT_LOC_STRINGS = NO;
+SWIFT_VERSION = 5.0;
+};
+name = Release;
+};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+1F16F0E92BE5707B00C0D5A1 /* Build configuration list for PBXProject "QBankLite" */ = {
+isa = XCConfigurationList;
+buildConfigurations = (
+1F16F0F72BE5707B00C0D5A1 /* Debug */,
+1F16F0F82BE5707B00C0D5A1 /* Release */,
+);
+defaultConfigurationIsVisible = 0;
+defaultConfigurationName = Release;
+};
+1F16F1072BE5707B00C0D5A1 /* Build configuration list for PBXNativeTarget "QBankLite" */ = {
+isa = XCConfigurationList;
+buildConfigurations = (
+1F16F1082BE5707B00C0D5A1 /* Debug */,
+1F16F1092BE5707B00C0D5A1 /* Release */,
+);
+defaultConfigurationIsVisible = 0;
+defaultConfigurationName = Release;
+};
+/* End XCConfigurationList section */
+
+};
+rootObject = 1F16F0E62BE5707B00C0D5A1 /* Project object */;
+}
