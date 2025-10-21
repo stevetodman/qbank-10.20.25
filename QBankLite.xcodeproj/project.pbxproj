@@ -48,6 +48,7 @@ children = (
 1F16F1152BE5714900C0D5A1 /* README.md */,
 1F16F0EF2BE5707B00C0D5A1 /* Products */,
 );
+path = QBankLite;
 sourceTree = "<group>";
 };
 1F16F0EF2BE5707B00C0D5A1 /* Products */ = {
