@@ -34,8 +34,10 @@
       });
     }
 
-    window.qbBridge = window.qbBridge || {};
-    window.qbBridge.onNativeMessage = function (message) {
+    const bridge = (window.qbBridge = window.qbBridge || {});
+    const queuedMessages = Array.isArray(bridge.pendingMessages) ? bridge.pendingMessages.slice() : [];
+    bridge.pendingMessages = [];
+    bridge.onNativeMessage = function (message) {
       if (!message) return;
       if (message.id && pending.has(message.id)) {
         const { resolve, reject } = pending.get(message.id);
@@ -49,6 +51,8 @@
         showToast('Auto-snapshot saved: ' + (message.payload.files || []).join(', '));
       }
     };
+
+    queuedMessages.forEach((message) => bridge.onNativeMessage(message));
 
     return {
       ensureDataDirs: () => send('ensureDataDirs', {}),
