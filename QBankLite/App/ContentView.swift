@@ -18,9 +18,10 @@ struct WebViewContainer: NSViewRepresentable {
         let userContent = configuration.userContentController
         let bootstrapScript = """
         window.qbBridge = window.qbBridge || {};
-        window.qbBridge.pending = window.qbBridge.pending || {};
+        window.qbBridge.pendingMessages = window.qbBridge.pendingMessages || [];
         window.qbBridge.onNativeMessage = window.qbBridge.onNativeMessage || function(msg) {
-            console.log('Bridge message received before js loads', msg);
+            window.qbBridge.pendingMessages.push(msg);
+            console.log('Bridge message queued before JS loads', msg);
         };
         """
         let script = WKUserScript(source: bootstrapScript, injectionTime: .atDocumentStart, forMainFrameOnly: true)
