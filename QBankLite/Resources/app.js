@@ -15,6 +15,7 @@
     exam: null,
     editor: { search: '', selectedId: null },
     autoSnapshot: true,
+    autoSnapshotIntervalMinutes: 10,
     lastSummary: null,
     keyboardEnabled: true
   };
@@ -61,7 +62,8 @@
       importFile: (accept) => send('importFile', { accept }),
       snapshotNow: () => send('snapshotNow', {}),
       getAppInfo: () => send('getAppInfo', {}),
-      setAutoSnapshots: (enabled) => send('setAutoSnapshots', { enabled })
+      setAutoSnapshots: (enabled) => send('setAutoSnapshots', { enabled }),
+      setSnapshotInterval: (intervalSeconds) => send('setSnapshotInterval', { intervalSeconds })
     };
   })();
 
@@ -85,6 +87,8 @@
       const info = await qb.ensureDataDirs();
       state.info = info;
       state.autoSnapshot = info.autoSnapshots !== false;
+      const intervalSeconds = typeof info.autoSnapshotInterval === 'number' ? info.autoSnapshotInterval : 600;
+      state.autoSnapshotIntervalMinutes = Math.max(1, Math.round(intervalSeconds / 60));
       const itemsResponse = await qb.readTextFile('items.json');
       state.itemsRaw = itemsResponse.content || '[]';
       state.items = JSON.parse(state.itemsRaw);
@@ -182,6 +186,7 @@
       `;
     }
     const session = state.session;
+    const isReview = session.mode === 'review';
     const currentId = session.order[session.index];
     const item = state.items.find(it => it.id === currentId);
     if (!item) {
@@ -208,27 +213,29 @@
     const status = response.revealed
       ? `<p class="${response.selected === item.answer_key ? 'badge success' : 'badge danger'}">${response.selected === item.answer_key ? 'Correct' : 'Incorrect'}</p>`
       : '';
+    const contextNotice = isReview ? '<p class="small">Reviewing missed exam questions. Answers are highlighted for reference.</p>' : '';
 
     return `
       <div class="card">
         <div class="flex-between">
-          <h2>Practice (${session.index + 1}/${session.order.length})</h2>
+          <h2>${isReview ? 'Review' : 'Practice'} (${session.index + 1}/${session.order.length})</h2>
           <div>
             <span class="badge">Confidence: ${response.confidence}</span>
             ${response.reviewed ? '<span class="badge warning">Marked for review</span>' : ''}
           </div>
         </div>
+        ${contextNotice}
         <p>${escapeHtml(item.stem)}</p>
         ${item.image ? `<div class="space-top"><img src="qb://media/images/${encodeURIComponent(item.image)}" alt="Question image" class="practice-image" data-action="open-image" data-src="qb://media/images/${encodeURIComponent(item.image)}" style="max-width:100%;border-radius:12px;cursor:zoom-in;"></div>` : ''}
         ${item.audio ? `<div class="space-top"><audio controls src="qb://media/audio/${encodeURIComponent(item.audio)}"></audio></div>` : ''}
         <div class="space-top">${choices}</div>
         <div class="space-top toolbar">
-          <button class="primary" data-action="reveal" ${response.revealed ? 'disabled' : ''}>Reveal</button>
+          <button class="primary" data-action="reveal" ${response.revealed || isReview ? 'disabled' : ''}>Reveal</button>
           <button data-action="prev">Prev (K)</button>
           <button data-action="next">Next (J)</button>
           <button data-action="toggle-review">Toggle Review (R)</button>
           <button data-action="cycle-confidence">Confidence (C)</button>
-          <button data-action="end-session">End Session</button>
+          <button data-action="end-session">${isReview ? 'Close Review' : 'End Session'}</button>
         </div>
         ${status}
         ${response.revealed ? `<div class="card" style="margin-top:16px;"><h3>Explanation</h3><p>${escapeHtml(item.explanation || 'No explanation provided.')}</p></div>` : ''}
@@ -386,6 +393,10 @@
         <h2>Settings</h2>
         <p>Data path: ${escapeHtml(state.info?.dataPath || '')}</p>
         <label><input type="checkbox" id="toggle-snapshots" ${state.autoSnapshot ? 'checked' : ''}> Enable auto snapshots</label>
+        <label class="space-top">Snapshot interval (minutes)
+          <input type="number" id="snapshot-interval" min="1" max="1440" step="1" value="${state.autoSnapshotIntervalMinutes}" ${state.autoSnapshot ? '' : 'disabled'}>
+        </label>
+        <p class="small">Automatic snapshots run at this cadence when enabled.</p>
         <div class="toolbar" style="margin-top:16px;">
           <button data-action="snapshot-now">Snapshot now</button>
         </div>
@@ -424,12 +435,13 @@
       'import-csv': importCSV,
       'export-json': exportJSON,
       'export-csv': exportCSV,
-      'snapshot-now': manualSnapshot
+      'snapshot-now': manualSnapshot,
+      'review-miss': (_, target) => reviewMiss(target.dataset.id)
     };
 
     appEl.querySelectorAll('[data-action]').forEach(el => {
       const action = el.dataset.action;
-      if (action === 'nav' || action === 'open-image') return;
+      if (action === 'nav') return;
       el.addEventListener('click', ev => {
         const handler = mapping[action];
         if (handler) handler(ev, el);
@@ -489,8 +501,38 @@
     const toggle = document.getElementById('toggle-snapshots');
     if (toggle) {
       toggle.addEventListener('change', async () => {
-        state.autoSnapshot = toggle.checked;
-        await qb.setAutoSnapshots(toggle.checked);
+        const desired = toggle.checked;
+        try {
+          await qb.setAutoSnapshots(desired);
+          state.autoSnapshot = desired;
+          if (state.info) state.info.autoSnapshots = desired;
+          const intervalInput = document.getElementById('snapshot-interval');
+          if (intervalInput) intervalInput.disabled = !desired;
+        } catch (err) {
+          toggle.checked = !desired;
+          state.autoSnapshot = toggle.checked;
+          alert(err);
+        }
+      });
+    }
+
+    const intervalInput = document.getElementById('snapshot-interval');
+    if (intervalInput) {
+      intervalInput.addEventListener('change', async () => {
+        if (intervalInput.disabled) return;
+        let minutes = parseInt(intervalInput.value, 10);
+        if (!Number.isFinite(minutes)) minutes = state.autoSnapshotIntervalMinutes;
+        minutes = Math.max(1, Math.min(1440, minutes));
+        intervalInput.value = String(minutes);
+        if (minutes === state.autoSnapshotIntervalMinutes) return;
+        state.autoSnapshotIntervalMinutes = minutes;
+        if (state.info) state.info.autoSnapshotInterval = minutes * 60;
+        try {
+          await qb.setSnapshotInterval(minutes * 60);
+          showToast('Auto-snapshot interval updated.');
+        } catch (err) {
+          alert(err);
+        }
       });
     }
 
@@ -544,7 +586,7 @@
   }
 
   function selectPracticeChoice(letter) {
-    if (!state.session) return;
+    if (!state.session || state.session.mode === 'review') return;
     const id = state.session.order[state.session.index];
     const current = state.session.responses[id] || { confidence: 1, reviewed: false, revealed: false };
     state.session.responses[id] = { ...current, selected: letter };
@@ -552,7 +594,7 @@
   }
 
   function revealPractice() {
-    if (!state.session) return;
+    if (!state.session || state.session.mode === 'review') return;
     const id = state.session.order[state.session.index];
     const item = state.items.find(it => it.id === id);
     if (!item) return;
@@ -571,7 +613,7 @@
   }
 
   function cyclePracticeConfidence() {
-    if (!state.session) return;
+    if (!state.session || state.session.mode === 'review') return;
     const id = state.session.order[state.session.index];
     const current = state.session.responses[id] || { confidence: 1, reviewed: false };
     const next = current.confidence ? ((current.confidence) % 3) + 1 : 1;
@@ -580,7 +622,7 @@
   }
 
   function togglePracticeReview() {
-    if (!state.session) return;
+    if (!state.session || state.session.mode === 'review') return;
     const id = state.session.order[state.session.index];
     const current = state.session.responses[id] || { confidence: 1, reviewed: false };
     state.session.responses[id] = { ...current, reviewed: !current.reviewed };
@@ -589,6 +631,15 @@
 
   async function endPractice() {
     if (!state.session) return;
+    if (state.session.mode === 'review') {
+      state.session = null;
+      if (state.exam && state.exam.submitted) {
+        setView('exam');
+      } else {
+        setView('home');
+      }
+      return;
+    }
     const record = buildSessionRecord(state.session);
     await finalizeSession(record);
     state.session = null;
@@ -658,6 +709,36 @@
     const misses = record.results.filter(r => !r.correct);
     state.exam.summary = { ...summary, misses };
     state.exam.submitted = true;
+    render();
+  }
+
+  function reviewMiss(id) {
+    if (!state.exam?.summary) return;
+    const misses = state.exam.summary.misses || [];
+    if (!misses.length) return;
+    const availableIds = new Set(state.items.map(item => item.id));
+    const validMisses = misses.filter(record => availableIds.has(record.id));
+    if (!validMisses.length) return;
+    const order = validMisses.map(record => record.id);
+    const responses = {};
+    validMisses.forEach(record => {
+      responses[record.id] = {
+        selected: record.selected || null,
+        revealed: true,
+        confidence: Math.min(3, Math.max(1, record.confidence || 1)),
+        reviewed: false
+      };
+    });
+    const startIndex = order.indexOf(id);
+    state.session = {
+      mode: 'review',
+      order,
+      index: startIndex === -1 ? 0 : startIndex,
+      responses,
+      startedAt: new Date(),
+      version: state.bankHash
+    };
+    state.view = 'practice';
     render();
   }
 
