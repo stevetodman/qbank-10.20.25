@@ -35,10 +35,26 @@ struct DirectoryHelper {
 
     private static let historyQueue = DispatchQueue(label: "com.qbanklite.history", qos: .utility)
     private static let autoSnapshotKey = "com.qbanklite.autoSnapshots"
+    private static let autoSnapshotIntervalKey = "com.qbanklite.autoSnapshotInterval"
+    private static let minimumSnapshotInterval: TimeInterval = 60
+    private static let maximumSnapshotInterval: TimeInterval = 60 * 60 * 24
+    private static let defaultSnapshotInterval: TimeInterval = 600
 
     static var autoSnapshotEnabled: Bool {
         get { UserDefaults.standard.object(forKey: autoSnapshotKey) as? Bool ?? true }
         set { UserDefaults.standard.set(newValue, forKey: autoSnapshotKey) }
+    }
+
+    static var autoSnapshotInterval: TimeInterval {
+        get {
+            let stored = UserDefaults.standard.double(forKey: autoSnapshotIntervalKey)
+            if stored >= minimumSnapshotInterval { return min(stored, maximumSnapshotInterval) }
+            return defaultSnapshotInterval
+        }
+        set {
+            let clamped = max(minimumSnapshotInterval, min(newValue, maximumSnapshotInterval))
+            UserDefaults.standard.set(clamped, forKey: autoSnapshotIntervalKey)
+        }
     }
 
     @discardableResult
@@ -58,8 +74,31 @@ struct DirectoryHelper {
             "itemsPath": itemsURL.path,
             "historyPath": historyURL.path,
             "snapshotsPath": snapshotsURL.path,
-            "autoSnapshots": autoSnapshotEnabled
+            "autoSnapshots": autoSnapshotEnabled,
+            "autoSnapshotInterval": autoSnapshotInterval
         ]
+    }
+
+    private static func validatedURL(_ url: URL) throws -> URL {
+        let resolvedBase = baseURL.standardizedFileURL.resolvingSymlinksInPath()
+        let resolved = url.standardizedFileURL.resolvingSymlinksInPath()
+        guard isDescendant(resolved, of: resolvedBase) else { throw DirectoryError.invalidPath }
+        return resolved
+    }
+
+    private static func validatedURL(named name: String) throws -> URL {
+        let candidate = baseURL.appendingPathComponent(name)
+        return try validatedURL(candidate)
+    }
+
+    private static func isDescendant(_ candidate: URL, of base: URL) -> Bool {
+        let candidateComponents = candidate.pathComponents
+        let baseComponents = base.pathComponents
+        guard candidateComponents.count >= baseComponents.count else { return false }
+        for (baseComponent, candidateComponent) in zip(baseComponents, candidateComponents) {
+            if baseComponent != candidateComponent { return false }
+        }
+        return true
     }
 
     private static func ensureDirectories() throws {
@@ -95,48 +134,49 @@ struct DirectoryHelper {
 
     static func readTextFile(named name: String) throws -> String {
         try ensureDirectories()
-        let url = baseURL.appendingPathComponent(name)
-        guard url.path.hasPrefix(baseURL.path) else { throw DirectoryError.invalidPath }
+        let url = try validatedURL(named: name)
         return try String(contentsOf: url)
     }
 
     static func writeTextFile(named name: String, content: String) throws {
         try ensureDirectories()
-        let url = baseURL.appendingPathComponent(name)
-        guard url.path.hasPrefix(baseURL.path) else { throw DirectoryError.invalidPath }
+        let url = try validatedURL(named: name)
         try content.write(to: url, atomically: true, encoding: .utf8)
     }
 
     static func appendHistory(record: Any) throws {
         try ensureDirectories()
+        let historyFile = try validatedURL(historyURL)
         try historyQueue.sync {
-            let existingData = (try? Data(contentsOf: historyURL)) ?? Data("[]".utf8)
+            let existingData = (try? Data(contentsOf: historyFile)) ?? Data("[]".utf8)
             var array = (try? JSONSerialization.jsonObject(with: existingData, options: [])) as? [Any] ?? []
             array.append(record)
             let output = try JSONSerialization.data(withJSONObject: array, options: [.prettyPrinted])
-            try output.write(to: historyURL, options: .atomic)
+            try output.write(to: historyFile, options: .atomic)
         }
     }
 
     static func listMedia(kind: String) throws -> [String] {
         guard let mediaKind = MediaKind(rawValue: kind) else { throw DirectoryError.invalidPath }
-        let url = mediaKind == .images ? mediaImagesURL : mediaAudioURL
+        let url = try validatedURL(mediaKind == .images ? mediaImagesURL : mediaAudioURL)
         let contents = (try? fileManager.contentsOfDirectory(atPath: url.path)) ?? []
         return contents.sorted()
     }
 
     static func copyIntoMedia(kind: String, urls: [URL]) throws -> [String] {
         guard let mediaKind = MediaKind(rawValue: kind) else { throw DirectoryError.invalidPath }
-        let destinationDir = mediaKind == .images ? mediaImagesURL : mediaAudioURL
+        let destinationDir = try validatedURL(mediaKind == .images ? mediaImagesURL : mediaAudioURL)
         var results: [String] = []
         for source in urls {
             var destination = destinationDir.appendingPathComponent(source.lastPathComponent)
+            destination = try validatedURL(destination)
             if fileManager.fileExists(atPath: destination.path) {
                 let base = destination.deletingPathExtension().lastPathComponent
                 let ext = destination.pathExtension
                 let suffix = String(UUID().uuidString.prefix(8))
                 let uniqueName = base + "_" + suffix
                 destination = destinationDir.appendingPathComponent(uniqueName + (ext.isEmpty ? "" : "." + ext))
+                destination = try validatedURL(destination)
             }
             if destination.path == source.path {
                 results.append(destination.lastPathComponent)
@@ -156,23 +196,27 @@ struct DirectoryHelper {
         formatter.dateFormat = "yyyyMMdd_HHmmss"
         formatter.locale = Locale(identifier: "en_US_POSIX")
         let stamp = formatter.string(from: Date())
-        let itemsSnapshot = snapshotsURL.appendingPathComponent("items_\(stamp).json")
-        let historySnapshot = snapshotsURL.appendingPathComponent("history_\(stamp).json")
-        if fileManager.fileExists(atPath: itemsURL.path) {
+        let itemsFile = try validatedURL(itemsURL)
+        let historyFile = try validatedURL(historyURL)
+        let snapshotsDir = try validatedURL(snapshotsURL)
+        let itemsSnapshot = snapshotsDir.appendingPathComponent("items_\(stamp).json")
+        let historySnapshot = snapshotsDir.appendingPathComponent("history_\(stamp).json")
+        if fileManager.fileExists(atPath: itemsFile.path) {
             try? fileManager.removeItem(at: itemsSnapshot)
-            try fileManager.copyItem(at: itemsURL, to: itemsSnapshot)
+            try fileManager.copyItem(at: itemsFile, to: itemsSnapshot)
             filenames.append(itemsSnapshot.lastPathComponent)
         }
-        if fileManager.fileExists(atPath: historyURL.path) {
+        if fileManager.fileExists(atPath: historyFile.path) {
             try? fileManager.removeItem(at: historySnapshot)
-            try fileManager.copyItem(at: historyURL, to: historySnapshot)
+            try fileManager.copyItem(at: historyFile, to: historySnapshot)
             filenames.append(historySnapshot.lastPathComponent)
         }
         return filenames
     }
 
     static func sha256OfItems() -> String {
-        guard let data = try? Data(contentsOf: itemsURL) else { return "" }
+        guard let itemsFile = try? validatedURL(itemsURL),
+              let data = try? Data(contentsOf: itemsFile) else { return "" }
         let digest = SHA256.hash(data: data)
         return digest.map { String(format: "%02hhx", $0) }.joined()
     }

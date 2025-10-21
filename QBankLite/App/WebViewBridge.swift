@@ -11,7 +11,7 @@ final class WebViewBridge: NSObject, WKScriptMessageHandler {
     init(webView: WKWebView) {
         self.webView = webView
         super.init()
-        scheduleSnapshotTimer()
+        updateSnapshotTimer()
     }
 
     func invalidate() {
@@ -20,15 +20,21 @@ final class WebViewBridge: NSObject, WKScriptMessageHandler {
         webView?.configuration.userContentController.removeScriptMessageHandler(forName: "qbBridge")
     }
 
-    private func scheduleSnapshotTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 600, repeats: true) { [weak self] _ in
+    private func updateSnapshotTimer() {
+        DispatchQueue.main.async {
+            self.timer?.invalidate()
+            self.timer = nil
             guard DirectoryHelper.autoSnapshotEnabled else { return }
-            self?.queue.async {
-                do {
-                    let result = try DirectoryHelper.snapshotNow()
-                    self?.sendSuccess(id: nil, payload: ["type": "autosnapshot", "files": result])
-                } catch {
-                    self?.sendError(id: nil, message: "Auto-snapshot failed: \(error.localizedDescription)")
+            let interval = DirectoryHelper.autoSnapshotInterval
+            self.timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { [weak self] _ in
+                guard DirectoryHelper.autoSnapshotEnabled else { return }
+                self?.queue.async {
+                    do {
+                        let result = try DirectoryHelper.snapshotNow()
+                        self?.sendSuccess(id: nil, payload: ["type": "autosnapshot", "files": result])
+                    } catch {
+                        self?.sendError(id: nil, message: "Auto-snapshot failed: \(error.localizedDescription)")
+                    }
                 }
             }
         }
@@ -97,6 +103,12 @@ final class WebViewBridge: NSObject, WKScriptMessageHandler {
                 guard let enabled = payload["enabled"] as? Bool else { throw BridgeError.missingField("enabled") }
                 DirectoryHelper.autoSnapshotEnabled = enabled
                 sendSuccess(id: id, payload: ["ok": true])
+                updateSnapshotTimer()
+            case "setSnapshotInterval":
+                guard let interval = payload["intervalSeconds"] as? TimeInterval else { throw BridgeError.missingField("intervalSeconds") }
+                DirectoryHelper.autoSnapshotInterval = interval
+                sendSuccess(id: id, payload: ["ok": true])
+                updateSnapshotTimer()
             default:
                 throw BridgeError.unknownAction(action)
             }
